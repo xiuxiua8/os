@@ -87,3 +87,52 @@ exec call: 1
 system 函数会创建一个新的进程来执行命令，因此它分配了一个新的、更大的 PID
 
 exec 函数直接替换了原子进程（PID 7207）的地址空间，所以它的 PID 保持不变
+
+### tthread 
+
+bash-5.0$ make; ./t
+gcc -o t t.c
+/usr/bin/ld: /tmp/ccsXvg85.o: in function main':
+t.c:(.text+0x15c): undefined reference to pthread_create'
+/usr/bin/ld: t.c:(.text+0x178): undefined reference to pthread_create'
+/usr/bin/ld: t.c:(.text+0x184): undefined reference to pthread_join'
+/usr/bin/ld: t.c:(.text+0x190): undefined reference to pthread_join'
+collect2: error: ld returned 1 exit status
+make: *** [makefile:11: t] Error 1
+bash: ./t: No such file or directory
+
+错误是因为编译时没有链接 pthread 库，导致 pthread_create 和 pthread_join 等函数找不到引用。
+要解决这个问题，需要在编译时添加 -lpthread 选项。
+
+t: t.c
+	gcc -o t t.c
+
+将其修改为：
+
+t: t.c
+	gcc -o t t.c -lpthread
+
+
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+shared_var before decrement begins = 478
+Final value of shared_var = 0
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+shared_var before decrement begins = 451
+Final value of shared_var = 0
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+shared_var before decrement begins = 468
+Final value of shared_var = 0
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+shared_var before decrement begins = 640
+Final value of shared_var = 0
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+shared_var before decrement begins = 793
+Final value of shared_var = 0
+
+由此可见每一次decrement开始时，共享变量都有不同的值，两个线程互不干涉互不影响。
+但由于总执行5000加减操作，正负相消，最终结果总是零。
