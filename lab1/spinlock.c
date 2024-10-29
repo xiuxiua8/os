@@ -1,7 +1,7 @@
 /**
 * spinlock.c
 * in xjtu
-* 2023.8
+* 2024.10
 */
 
 #include <stdio.h>
@@ -48,14 +48,20 @@ int main() {
     spinlock_t lock;
 
     // 输出共享变量的值
+    printf("shared_value = %d\n",shared_value);
 
     // 初始化自旋锁
+    spinlock_init(&lock);
 
     // 创建两个线程
+    pthread_create(&thread1, NULL, thread_function, &lock);
+    pthread_create(&thread2, NULL, thread_function, &lock);
 
     // 等待线程结束
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
 
     // 输出共享变量的值
-
+    printf("shared_value = %d\n",shared_value);
     return 0;
 }

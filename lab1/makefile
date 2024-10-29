@@ -14,4 +14,4 @@ call2: call2.c
 	gcc -o call2 call2.c
 
 spinlock: spinlock.c
-	gcc -o spinlock spinlock.c
+	gcc -o spinlock spinlock.c -lpthread

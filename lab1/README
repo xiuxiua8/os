@@ -226,3 +226,10 @@ decrement calling exec
 call Program PID: 15750, TID: 15750
 
 且发现线程pid <= tid
+
+### spinlock
+bash-5.0$ make; ./spinlock
+gcc -o spinlock spinlock.c -lpthread
+shared_value = 0
+shared_value = 10000
+bash-5.0$ 
