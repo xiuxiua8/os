@@ -1,4 +1,4 @@
-all : p call t call2
+all : p call t call2 spinlock
 .PHONY : all
 
 p: p.c 
@@ -12,3 +12,6 @@ t: t.c
 
 call2: call2.c
 	gcc -o call2 call2.c
+
+spinlock: spinlock.c
+	gcc -o spinlock spinlock.c
