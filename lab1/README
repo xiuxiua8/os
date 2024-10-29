@@ -61,3 +61,29 @@ the global variable in child process is 15, address is 0x420060
 the global variable in parent process is 5, address is 0x420060
 
 让子进程sleep 5 seconds，父进程wait子进程后输出最后一行
+
+### add system and exec
+
+bash-5.0$ make; ./pid
+make: Nothing to be done for 'all'.
+parent: pid = 7207
+parent: pid1 = 7206
+the global variable in parent process is 5, address is 0x420068
+child: pid = 0
+child: pid1 = 7207
+the global variable in child process is 15, address is 0x420068
+system: 
+call program: PID = 7208
+exec: 
+call program: PID = 7207
+
+
+我们可以发现加入PID有如下规律，
+parent: 0
+child: 1
+system call: 2
+exec call: 1
+
+system 函数会创建一个新的进程来执行命令，因此它分配了一个新的、更大的 PID
+
+exec 函数直接替换了原子进程（PID 7207）的地址空间，所以它的 PID 保持不变
