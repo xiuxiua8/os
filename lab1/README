@@ -196,3 +196,33 @@ Final value of shared_var = 0
 
 
 条件变量 pthread_cond_t 允许线程在特定条件未满足时进入等待状态，而不是忙等。
+
+### thread calling system and exec
+
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+Thread calling exec
+call Program PID: 14799, TID: 14799
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+Thread calling system
+Thread calling exec
+call Program PID: 14813, TID: 14813
+call Program PID: 14816, TID: 14816
+
+有时线程decrement先调用了exec 程序直接不执行了，有时候后调用则能执行全部任务。  
+
+
+bash-5.0$ make; ./t
+gcc -o t t.c -lpthread
+main   itself PID: 15750, TID: 15750
+thread itself PID: 15750, TID: 15752
+decrement calling system
+thread itself PID: 15750, TID: 15751
+increment calling system
+call Program PID: 15753, TID: 15753
+call Program PID: 15754, TID: 15754
+decrement calling exec
+call Program PID: 15750, TID: 15750
+
+且发现线程pid <= tid
