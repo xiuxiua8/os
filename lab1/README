@@ -96,7 +96,7 @@ gcc -o t t.c
 t.c:(.text+0x15c): undefined reference to pthread_create'
 /usr/bin/ld: t.c:(.text+0x178): undefined reference to pthread_create'
 /usr/bin/ld: t.c:(.text+0x184): undefined reference to pthread_join'
-/usr/bin/ld: t.c:(.text+0x190): undefined reference to pthread_join'
+/usr/bin/ld: t.c:(.text+0x190): undefined reference to pthread_join''
 collect2: error: ld returned 1 exit status
 make: *** [makefile:11: t] Error 1
 bash: ./t: No such file or directory
@@ -134,5 +134,43 @@ make: Nothing to be done for 'all'.
 shared_var before decrement begins = 793
 Final value of shared_var = 0
 
-由此可见每一次decrement开始时，共享变量都有不同的值，两个线程互不干涉互不影响。
-但由于总执行5000加减操作，正负相消，最终结果总是零。
+由此可见每一次decrement开始时，共享变量都有不同的值，两个线程互不干涉互不影响。 没有同步关系。
+
+但都对shared_var有操作，且加了锁。总执行5000加减操作，正负相消，最终结果总是零。
+
+下面是去掉锁的输出，
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+shared_var before decrement begins = 5000
+Final value of shared_var = 0
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+shared_var before decrement begins = 4411
+Final value of shared_var = 0
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+
+当重复次数为5000时，increment和decrement不易发生竞争，
+现将5000 调整为 500000，输出如下：
+
+
+shared_var before decrement begins = 6841
+Final value of shared_var = 7453
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+shared_var before decrement begins = 4525
+Final value of shared_var = -118859
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+shared_var before decrement begins = 5058
+Final value of shared_var = -52682
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+shared_var before decrement begins = 4938
+Final value of shared_var = -101202
+bash-5.0$ make; ./t
+make: Nothing to be done for 'all'.
+shared_var before decrement begins = 0
+Final value of shared_var = 0
+
+可发现最终结果不为零，这与我们的常识相违背。

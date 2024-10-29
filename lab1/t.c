@@ -6,20 +6,20 @@ int shared_var = 0;
 pthread_mutex_t lock;
 
 void *increment(void *param) {
-    for (int i = 0; i < 5000; i++) {
-        pthread_mutex_lock(&lock);
+    for (int i = 0; i < 500000; i++) {
+        //pthread_mutex_lock(&lock);
         shared_var++;
-        pthread_mutex_unlock(&lock);
+        //pthread_mutex_unlock(&lock);
     }
     return NULL;
 }
 
 void *decrement(void *param) {
     printf("shared_var before decrement begins = %d\n", shared_var);
-    for (int i = 0; i < 5000; i++) {
-        pthread_mutex_lock(&lock);
+    for (int i = 0; i < 500000; i++) {
+        //pthread_mutex_lock(&lock);
         shared_var--;
-        pthread_mutex_unlock(&lock);
+        //pthread_mutex_unlock(&lock);
     }
     return NULL;
 }
