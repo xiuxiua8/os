@@ -1,0 +1,63 @@
+### original code:
+with wait:
+        bash-5.0$ make; ./pid
+        make: Nothing to be done for 'all'.
+        parent: pid = 3281
+        parent: pid1 = 3280
+        child: pid = 0
+        child: pid1 = 3281
+without wait:
+        bash-5.0$ make; ./pid
+        make: Nothing to be done for 'all'.
+        parent: pid = 3281
+        parent: pid1 = 3280
+        child: pid = 0
+        child: pid1 = 3281
+
+### add global variable:
+with wait:
+
+bash-5.0$ make; ./pid
+gcc -o pid pid.c 
+parent: pid = 4956
+parent: pid1 = 4955
+the global variable now is 5, address is 0x420050
+child: pid = 0
+child: pid1 = 4956
+the global variable now is 15, address is 0x420050
+
+bash-5.0$ make; ./pid
+make: Nothing to be done for 'all'.
+parent: pid = 4986
+parent: pid1 = 4985
+child: pid = 0
+child: pid1 = 4986
+the global variable now is 15, address is 0x420050
+the global variable now is 5, address is 0x420050
+
+bash-5.0$ make; ./pid
+make: Nothing to be done for 'all'.
+parent: pid = 5010
+parent: pid1 = 5009
+the global variable now is 5, address is 0x420050
+child: pid = 0
+child: pid1 = 5010
+the global variable now is 15, address is 0x420050
+
+可见输出顺序是完全随机的，
+
+### child sleep for a while 
+
+如果我们加入sleep()，就可以实现任意的输出顺序，下面是一个例子
+
+bash-5.0$ make; ./pid
+gcc -o pid pid.c 
+parent: pid = 5560
+parent: pid1 = 5559
+slept for 5 secends
+child: pid = 0
+child: pid1 = 5560
+the global variable in child process is 15, address is 0x420060
+the global variable in parent process is 5, address is 0x420060
+
+让子进程sleep 5 seconds，父进程wait子进程后输出最后一行
