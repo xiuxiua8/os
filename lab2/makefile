@@ -1,4 +1,4 @@
-all : signal pipe
+all : signal pipe m
 .PHONY : all 
 
 signal: signal.c
@@ -7,3 +7,6 @@ signal: signal.c
 
 pipe: pipe.c
 	gcc -o pipe pipe.c -lpthread 
+
+m: m.c
+	gcc -o m m.c
