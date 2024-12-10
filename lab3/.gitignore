@@ -5,4 +5,7 @@
 *.mod.c
 *.o
 *.mod
-
+modify_new_syscall
+modify_old_syscall
+read
+write

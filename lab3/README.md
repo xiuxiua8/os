@@ -32,3 +32,139 @@
 (3) 模拟实现虚拟存储
 分析研究虚拟存储的思想，模拟实现虚拟存储（要包括数据缓冲、交换文件的设计）。
 
+## 实验内容
+### 1 编译、安装与卸载动态模块
+
+make
+ls
+sudo insmod mymodules.ko
+lsmod 
+rmmod mymodules
+
+
+- 诊断信息 diagnostic
+sudo dmesg -T
+
+- 查询内核版本
+uname -r
+cat /proc/version
+hostnamectl
+dmesg | grep "Linux version"
+
+
+- 是否包含 mymodules
+lsmod | grep mymodules
+ls -l /dev/ | grep mymodules
+- 删除
+sudo rmmod mymodules
+
+
+### 2 实现系统调用的篡改
+
+- 编译模块 加载模块
+make
+sudo insmod modify_syscall.ko
+- 执行用户程序
+./modify_old_syscall
+./modify_new_syscall
+- 卸除模块
+rmmod modify_syscall
+
+我执行了
+sudo insmod modify_syscall.ko
+vscode 的ssh连接就卡掉了
+
+这可能是系统调用表中 syscall 78 的行为被错误地修改，影响了系统的正常运行，甚至可能导致 系统内核陷入不稳定状态。
+SSH 服务可能依赖于 syscall 78（如 gettimeofday 或其他时间相关功能）来处理网络通信、超时计算等。如果系统调用被替换为不兼容的逻辑，SSH 服务会异常。
+
+
+从 `/boot/System.map` 文件中手动查找地址。
+
+怎么做？
+
+bash-5.0$ ls /boot/System.map-$(uname -r)
+/boot/System.map-4.19.90-2110.8.0.0119.oe1.aarch64
+bash-5.0$ grep sys_call_table /boot/System.map-$(uname -r)
+ffff000008af0698 R sys_call_table
+ffff000008af3a98 R a32_sys_call_table
+
+内核崩溃是因为你的模块试图对只读区域进行写操作吧
+
+系统调用篡改那里需要先关闭对应位置的写保护
+
+### 3 编写一个简单的字符设备驱动程序，以内核空间模拟字符设备，完成对该设备的打开、读写和释放操作
+
+### 4 编写聊天程序实现不同用户通过该设备的一对一、一对多、多对多聊天
+
+bash-5.0$ lsmod
+Module                  Size  Used by
+aes_ce_blk            262144  0
+crypto_simd           262144  1 aes_ce_blk
+cryptd                262144  1 crypto_simd
+aes_ce_cipher         262144  1 aes_ce_blk
+ghash_ce              262144  0
+sha2_ce               262144  0
+sha256_arm64          262144  1 sha2_ce
+
+#### insert module globalvar
+bash-5.0$ sudo insmod globalvar.ko
+[sudo] password for zilong: 
+bash-5.0$ lsmod
+Module                  Size  Used by
+globalvar             262144  0
+aes_ce_blk            262144  0
+crypto_simd           262144  1 aes_ce_blk
+cryptd                262144  1 crypto_simd
+aes_ce_cipher         262144  1 aes_ce_blk
+ghash_ce              262144  0
+
+
+#### insert module modify_syscall ssh中断了
+
+
+[zilong@ecs-zilong ~]$ ls
+bin  coding  dotfiles  share
+[zilong@ecs-zilong ~]$ lsmod
+Module                  Size  Used by
+globalvar             262144  0
+aes_ce_blk            262144  0
+crypto_simd           262144  1 aes_ce_blk
+cryptd                262144  1 crypto_simd
+aes_ce_cipher         262144  1 aes_ce_blk
+
+[zilong@ecs-zilong ~]$ Connection to 121.36.88.76 closed by remote host.
+Connection to 121.36.88.76 closed.
+❯ ssh hua
+bind [127.0.0.1]:9999: Address already in use
+channel_setup_fwd_listener_tcpip: cannot listen to port: 9999
+Could not request local forwarding.
+
+	Welcome to Huawei Cloud Service
+
+Last login: Wed Dec 11 00:53:49 2024 from 1.85.33.91
+
+
+Welcome to 4.19.90-2110.8.0.0119.oe1.aarch64
+
+System information as of time: 	2024年 12月 11日 星期三 00:58:57 CST
+
+System load: 	2.54
+Processes: 	160
+Memory used: 	21.1%
+Swap used: 	0.0%
+Usage On: 	14%
+IP address: 	192.168.1.54
+Users online: 	1
+
+
+
+[zilong@ecs-zilong ~]$ lsmod
+Module                  Size  Used by
+aes_ce_blk            262144  0
+crypto_simd           262144  1 aes_ce_blk
+cryptd                262144  1 crypto_simd
+aes_ce_cipher         262144  1 aes_ce_blk
+ghash_ce              262144  0
+
+注意到globalvar也不见了
+
