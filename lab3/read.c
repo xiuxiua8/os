@@ -8,7 +8,7 @@ int main(void)
 {
     int fd, i;
     char num[1024];
-    fd = open("/dev/chardev0", O_RDWR, S_IRUSR | S_IWUSR);
+    fd = open("/dev/ch_device", O_RDWR, S_IRUSR | S_IWUSR);
     if (fd != -1)
     {
         while (1)

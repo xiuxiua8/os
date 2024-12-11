@@ -9,7 +9,7 @@ int main(void) {
     char buffer[1024];
 
     // 打开设备文件进行写入
-    fd = open("/dev/chardev0", O_RDWR);
+    fd = open("/dev/ch_device", O_RDWR);
     if (fd == -1) {
         perror("Unable to open device");
         exit(EXIT_FAILURE);

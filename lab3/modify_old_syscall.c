@@ -5,8 +5,9 @@
 int main()
 {
     struct timeval tv;
-    syscall(78, &tv, NULL); // before modify syscall 96 :gettimeofday
-    printf("tv_sec:%d\n", tv.tv_sec);
-    printf("tv_usec:%d\n", tv.tv_usec);
+    syscall(78, &tv, NULL); 
+    printf("tv_sec:%ld\n", (long)tv.tv_sec);
+    printf("tv_usec:%ld\n", (long)tv.tv_usec);
+
     return 0;
 } 

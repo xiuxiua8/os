@@ -70,7 +70,7 @@ static int __init globalvar_init(void) {
     globalvar.end = globalvar.buffer + MAXNUM;
     globalvar.flag = 0;
 
-    my_class = class_create(THIS_MODULE, "chardev0");
+    my_class = class_create(THIS_MODULE, "ch_device");
     if (IS_ERR(my_class)) {
         pr_err("Failed to create device class\n");
         cdev_del(&globalvar.devm);
@@ -78,7 +78,7 @@ static int __init globalvar_init(void) {
         return PTR_ERR(my_class);
     }
 
-    if (!device_create(my_class, NULL, dev, NULL, "chardev0")) {
+    if (!device_create(my_class, NULL, dev, NULL, "ch_device")) {
         pr_err("Failed to create device\n");
         class_destroy(my_class);
         cdev_del(&globalvar.devm);
