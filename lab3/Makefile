@@ -9,7 +9,7 @@ modules:
 	
 clean:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) clean 
-	rm -f modify_old_syscall modify_new_syscall
+	rm -f modify_old_syscall modify_new_syscall read write
 
 all : modify_old_syscall modify_new_syscall read write 
 .PHONY : all
@@ -22,5 +22,5 @@ read: read.c
 write: write.c
 	gcc -o $@ $<
 
-	
+
 endif
